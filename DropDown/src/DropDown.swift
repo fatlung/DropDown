@@ -96,24 +96,8 @@ public final class DropDown: UIView {
 	*/
     public var direction = Direction.any {
         didSet {
-            switch direction {
-            case .top:
-                topSpaceConstraint?.constant = 0
-                bottomSpaceConstraint?.constant = -arrowHeight
-                updateConstraints()
-            case .bottom:
-                topSpaceConstraint?.constant = arrowHeight
-                bottomSpaceConstraint?.constant = 0
-                updateConstraints()
-            case .any:
-                if let _ = topSpaceConstraint,
-                    let _ = bottomSpaceConstraint {
-                    topSpaceConstraint?.constant = 0
-                    bottomSpaceConstraint?.constant = 0
-                    updateConstraints()
-                }
-            }
             tableViewContainer.direction = direction
+            setNeedsUpdateConstraints()
         }
     }
 
@@ -588,6 +572,21 @@ extension DropDown {
 		widthConstraint.constant = layout.width
 		heightConstraint.constant = layout.visibleHeight
 		tableView.isScrollEnabled = layout.offscreenHeight > 0
+
+        switch direction {
+        case .top:
+            topSpaceConstraint?.constant = 0
+            bottomSpaceConstraint?.constant = -arrowHeight
+        case .bottom:
+            topSpaceConstraint?.constant = arrowHeight
+            bottomSpaceConstraint?.constant = 0
+        case .any:
+            if let _ = topSpaceConstraint,
+                let _ = bottomSpaceConstraint {
+                topSpaceConstraint?.constant = 0
+                bottomSpaceConstraint?.constant = 0
+            }
+        }
 
 		DispatchQueue.main.async { [weak self] in
 			self?.tableView.flashScrollIndicators()
