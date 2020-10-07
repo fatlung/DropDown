@@ -26,6 +26,9 @@ extension DropDown {
 		appearance.textColor = DPDConstant.UI.TextColor
         appearance.selectedTextColor = DPDConstant.UI.SelectedTextColor
 		appearance.textFont = DPDConstant.UI.TextFont
+        appearance.borderColor = DPDConstant.UI.BorderColor
+        appearance.borderWidth = DPDConstant.UI.BorderWidth
+
 	}
 
 }

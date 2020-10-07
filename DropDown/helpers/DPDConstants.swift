@@ -30,9 +30,13 @@ internal struct DPDConstant {
 		static let BackgroundColor = UIColor(white: 0.94, alpha: 1)
 		static let SelectionBackgroundColor = UIColor(white: 0.89, alpha: 1)
 		static let SeparatorColor = UIColor.clear
-		static let CornerRadius: CGFloat = 2
+		static let CornerRadius: CGFloat = 0
 		static let RowHeight: CGFloat = 44
 		static let HeightPadding: CGFloat = 20
+        static let BorderColor: UIColor = UIColor.black
+        static let BorderWidth: CGFloat = 1.0
+        static let ArrowHeight: CGFloat = 10.0
+        static let ArrowWidth: CGFloat = 40.0
 
 		struct Shadow {
 

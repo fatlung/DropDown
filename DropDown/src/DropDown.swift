@@ -40,6 +40,20 @@ extension UIBarButtonItem: AnchorView {
 
 }
 
+/// The direction where the drop down will show from the `anchorView`.
+public enum Direction {
+
+    /// The drop down will show below the anchor view when possible, otherwise above if there is more place than below.
+    case any
+
+    /// The drop down will show above the anchor view or will not be showed if not enough space.
+    case top
+
+    /// The drop down will show below or will not be showed if not enough space.
+    case bottom
+
+}
+
 /// A Material Design drop down in replacement for `UIPickerView`.
 public final class DropDown: UIView {
 
@@ -59,20 +73,6 @@ public final class DropDown: UIView {
 
 	}
 
-	/// The direction where the drop down will show from the `anchorView`.
-	public enum Direction {
-
-		/// The drop down will show below the anchor view when possible, otherwise above if there is more place than below.
-		case any
-
-		/// The drop down will show above the anchor view or will not be showed if not enough space.
-		case top
-
-		/// The drop down will show below or will not be showed if not enough space.
-		case bottom
-
-	}
-
 	//MARK: - Properties
 
 	/// The current visible drop down. There can be only one visible drop down at a time.
@@ -80,26 +80,9 @@ public final class DropDown: UIView {
 
 	//MARK: UI
 	fileprivate let dismissableView = UIView()
-	fileprivate let tableViewContainer = UIView()
+	fileprivate let tableViewContainer = DropDownTableViewContainer()
 	fileprivate let tableView = UITableView()
 	fileprivate var templateCell: DropDownCell!
-    fileprivate lazy var arrowIndication: UIImageView = {
-        UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 10), false, 0)
-        let path = UIBezierPath()
-        path.move(to: CGPoint(x: 0, y: 10))
-        path.addLine(to: CGPoint(x: 20, y: 10))
-        path.addLine(to: CGPoint(x: 10, y: 0))
-        path.addLine(to: CGPoint(x: 0, y: 10))
-        UIColor.black.setFill()
-        path.fill()
-        let img = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        let tintImg = img?.withRenderingMode(.alwaysTemplate)
-        let imgv = UIImageView(image: tintImg)
-        imgv.frame = CGRect(x: 0, y: -10, width: 15, height: 10)
-        return imgv
-    }()
-
 
 	/// The view to which the drop down will displayed onto.
 	public weak var anchorView: AnchorView? {
@@ -111,7 +94,28 @@ public final class DropDown: UIView {
 
 	See `Direction` enum for more info.
 	*/
-	public var direction = Direction.any
+    public var direction = Direction.any {
+        didSet {
+            switch direction {
+            case .top:
+                topSpaceConstraint?.constant = 0
+                bottomSpaceConstraint?.constant = -arrowHeight
+                updateConstraints()
+            case .bottom:
+                topSpaceConstraint?.constant = arrowHeight
+                bottomSpaceConstraint?.constant = 0
+                updateConstraints()
+            case .any:
+                if let _ = topSpaceConstraint,
+                    let _ = bottomSpaceConstraint {
+                    topSpaceConstraint?.constant = 0
+                    bottomSpaceConstraint?.constant = 0
+                    updateConstraints()
+                }
+            }
+            tableViewContainer.direction = direction
+        }
+    }
 
 	/**
 	The offset point relative to `anchorView` when the drop down is shown above the anchor view.
@@ -152,28 +156,14 @@ public final class DropDown: UIView {
 		didSet { setNeedsUpdateConstraints() }
 	}
 
-	/**
-	arrowIndication.x
-
-	arrowIndication will be add to tableViewContainer when configured
-	*/
-	public var arrowIndicationX: CGFloat? {
-		didSet {
-			if let arrowIndicationX = arrowIndicationX {
-				tableViewContainer.addSubview(arrowIndication)
-				arrowIndication.tintColor = tableViewBackgroundColor
-				arrowIndication.frame.origin.x = arrowIndicationX
-			} else {
-				arrowIndication.removeFromSuperview()
-			}
-		}
-	}
 
 	//MARK: Constraints
 	fileprivate var heightConstraint: NSLayoutConstraint!
 	fileprivate var widthConstraint: NSLayoutConstraint!
 	fileprivate var xConstraint: NSLayoutConstraint!
 	fileprivate var yConstraint: NSLayoutConstraint!
+    fileprivate var topSpaceConstraint: NSLayoutConstraint?
+    fileprivate var bottomSpaceConstraint: NSLayoutConstraint?
 
 	//MARK: Appearance
 	@objc public dynamic var cellHeight = DPDConstant.UI.RowHeight {
@@ -184,13 +174,15 @@ public final class DropDown: UIView {
 	@objc fileprivate dynamic var tableViewBackgroundColor = DPDConstant.UI.BackgroundColor {
 		willSet {
             tableView.backgroundColor = newValue
-            if arrowIndicationX != nil { arrowIndication.tintColor = newValue }
+            tableViewContainer.containerBackgroundColor = newValue
         }
 	}
 
 	public override var backgroundColor: UIColor? {
 		get { return tableViewBackgroundColor }
-		set { tableViewBackgroundColor = newValue! }
+		set {
+            tableViewBackgroundColor = newValue!
+        }
 	}
 
 	/**
@@ -199,6 +191,29 @@ public final class DropDown: UIView {
 	public var dimmedBackgroundColor = UIColor.clear {
 		willSet { super.backgroundColor = newValue }
 	}
+
+    @objc public dynamic var borderColor: UIColor = UIColor.black {
+        didSet {
+            tableViewContainer.borderColor = borderColor
+        }
+    }
+    @objc public dynamic var borderWidth: CGFloat = 0.0 {
+        didSet {
+            tableViewContainer.borderWidth = borderWidth
+        }
+    }
+
+    public var arrowWidth: CGFloat = DPDConstant.UI.ArrowWidth {
+        didSet {
+            tableViewContainer.arrowWidth = arrowWidth
+        }
+    }
+
+    public var arrowHeight: CGFloat = DPDConstant.UI.ArrowHeight {
+        didSet {
+            tableViewContainer.arrowHeight = arrowHeight
+        }
+    }
 
 	/**
 	The background color of the selected cell in the drop down.
@@ -224,8 +239,8 @@ public final class DropDown: UIView {
 	*/
 	@objc public dynamic var cornerRadius = DPDConstant.UI.CornerRadius {
 		willSet {
-			tableViewContainer.layer.cornerRadius = newValue
-			tableView.layer.cornerRadius = newValue
+            tableView.layer.cornerRadius = newValue
+			tableViewContainer.cornerRadius = newValue
 		}
 		didSet { reloadAllComponents() }
 	}
@@ -234,7 +249,7 @@ public final class DropDown: UIView {
 	Alias method for `cornerRadius` variable to avoid ambiguity.
 	*/
 	@objc public dynamic func setupCornerRadius(_ radius: CGFloat) {
-		tableViewContainer.layer.cornerRadius = radius
+		tableViewContainer.cornerRadius = radius
 		tableView.layer.cornerRadius = radius
 		reloadAllComponents()
 	}
@@ -246,9 +261,9 @@ public final class DropDown: UIView {
 	*/
 	@available(iOS 11.0, *)
 	@objc public dynamic func setupMaskedCorners(_ cornerMask: CACornerMask) {
-		tableViewContainer.layer.maskedCorners = cornerMask
-		tableView.layer.maskedCorners = cornerMask
-		reloadAllComponents()
+//		tableViewContainer.layer.maskedCorners = cornerMask
+//		tableView.layer.maskedCorners = cornerMask
+//		reloadAllComponents()
 	}
 
 	/**
@@ -535,6 +550,10 @@ private extension DropDown {
 		tableViewContainer.layer.shadowOffset = shadowOffset
 		tableViewContainer.layer.shadowOpacity = shadowOpacity
 		tableViewContainer.layer.shadowRadius = shadowRadius
+        tableViewContainer.borderColor = borderColor
+        tableViewContainer.borderWidth = borderWidth
+        tableViewContainer.containerBackgroundColor = tableViewBackgroundColor
+
 
 		tableView.backgroundColor = tableViewBackgroundColor
 		tableView.separatorColor = separatorColor
@@ -568,7 +587,6 @@ extension DropDown {
 		yConstraint.constant = layout.y
 		widthConstraint.constant = layout.width
 		heightConstraint.constant = layout.visibleHeight
-
 		tableView.isScrollEnabled = layout.offscreenHeight > 0
 
 		DispatchQueue.main.async { [weak self] in
@@ -632,11 +650,49 @@ extension DropDown {
 			constant: 0)
 		tableViewContainer.addConstraint(heightConstraint)
 
-		// Table view
-		tableViewContainer.addSubview(tableView)
-		tableView.translatesAutoresizingMaskIntoConstraints = false
+        // Table view
+        tableViewContainer.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        topSpaceConstraint = NSLayoutConstraint(
+            item: tableView,
+            attribute: .top,
+            relatedBy: .equal,
+            toItem: tableViewContainer,
+            attribute: .top,
+            multiplier: 1,
+            constant: 0)
 
-		tableViewContainer.addUniversalConstraints(format: "|[tableView]|", views: ["tableView": tableView])
+        bottomSpaceConstraint = NSLayoutConstraint(
+            item: tableView,
+            attribute: .bottom,
+            relatedBy: .equal,
+            toItem: tableViewContainer,
+            attribute: .bottom,
+            multiplier: 1,
+            constant: 0)
+
+        let leftContraint = NSLayoutConstraint(
+            item: tableView,
+            attribute: .leading,
+            relatedBy: .equal,
+            toItem: tableViewContainer,
+            attribute: .leading,
+            multiplier: 1,
+            constant: 0)
+
+        let rightContraint = NSLayoutConstraint(
+            item: tableView,
+            attribute: .trailing,
+            relatedBy: .equal,
+            toItem: tableViewContainer,
+            attribute: .trailing,
+            multiplier: 1,
+            constant: 0)
+
+        tableViewContainer.addConstraint(topSpaceConstraint!)
+        tableViewContainer.addConstraint(bottomSpaceConstraint!)
+        tableViewContainer.addConstraint(leftContraint)
+        tableViewContainer.addConstraint(rightContraint)
 	}
 
 	public override func layoutSubviews() {
@@ -1019,7 +1075,7 @@ extension DropDown {
 
 	/// Returns the height needed to display all cells.
 	fileprivate var tableHeight: CGFloat {
-		return tableView.rowHeight * CGFloat(dataSource.count)
+		return tableView.rowHeight * CGFloat(dataSource.count) + arrowHeight
 	}
 
     //MARK: Objective-C methods for converting the Swift type Index

@@ -25,6 +25,7 @@
 		0AB5D89A1D0EF15D002D3A17 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AB5D8971D0EF15D002D3A17 /* ViewController.swift */; };
 		0AB5D8A11D0EF173002D3A17 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0AB5D89F1D0EF173002D3A17 /* Main.storyboard */; };
 		0AC1C33A1B6B884100A8DC0D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC1C3391B6B884100A8DC0D /* Images.xcassets */; };
+		A1DB9E38252AB32300B79B20 /* DropDownTableViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1DB9E37252AB32300B79B20 /* DropDownTableViewContainer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		0AB5D8971D0EF15D002D3A17 /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		0AB5D8A01D0EF173002D3A17 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0AC1C3391B6B884100A8DC0D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Demo/Images.xcassets; sourceTree = "<group>"; };
+		A1DB9E37252AB32300B79B20 /* DropDownTableViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropDownTableViewContainer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,6 +207,7 @@
 				0AB5D8841D0EEEFF002D3A17 /* DropDown+Appearance.swift */,
 				0AB5D8851D0EEEFF002D3A17 /* DropDown.swift */,
 				0AB5D8861D0EEEFF002D3A17 /* DropDownCell.swift */,
+				A1DB9E37252AB32300B79B20 /* DropDownTableViewContainer.swift */,
 			);
 			path = src;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1DB9E38252AB32300B79B20 /* DropDownTableViewContainer.swift in Sources */,
 				0AB5D88D1D0EEEFF002D3A17 /* DropDown.swift in Sources */,
 				0AB5D88C1D0EEEFF002D3A17 /* DropDown+Appearance.swift in Sources */,
 				0AB5D88A1D0EEEFF002D3A17 /* DPDUIView+Extension.swift in Sources */,
