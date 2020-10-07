@@ -16,7 +16,7 @@ public class DropDownTableViewContainer: UIView {
         didSet { setNeedsDisplay() }
     }
     // 0.0 to 1.0 (ratio) to width
-    public var arrowCenter: CGFloat = 0.3 {
+    public var arrowCenter: CGFloat = DPDConstant.UI.ArrowCenter {
         didSet { setNeedsDisplay() }
     }
     // Color of container

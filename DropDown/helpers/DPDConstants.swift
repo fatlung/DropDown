@@ -37,6 +37,7 @@ internal struct DPDConstant {
         static let BorderWidth: CGFloat = 1.0
         static let ArrowHeight: CGFloat = 10.0
         static let ArrowWidth: CGFloat = 40.0
+        static let ArrowCenter: CGFloat = 0.3
 
 		struct Shadow {
 

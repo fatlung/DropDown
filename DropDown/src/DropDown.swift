@@ -187,6 +187,12 @@ public final class DropDown: UIView {
         }
     }
 
+    @objc public dynamic var arrowCenter: CGFloat = DPDConstant.UI.ArrowCenter {
+        didSet {
+            tableViewContainer.arrowCenter = arrowCenter
+        }
+    }
+
     public var arrowWidth: CGFloat = DPDConstant.UI.ArrowWidth {
         didSet {
             tableViewContainer.arrowWidth = arrowWidth
